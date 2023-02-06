@@ -23,8 +23,6 @@ services:
       PGDATA: /data/postgres
     volumes:
        - postgres:/data/postgres
-    ports:
-      - "5432:5432"
     networks:
       - postgres
     restart: unless-stopped
@@ -36,18 +34,23 @@ services:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
       PGADMIN_CONFIG_SERVER_MODE: 'False'
+      VIRTUAL_HOST: ebk-ml-pgadmin.enking.dev
+      VIRTUAL_PORT: 8080
+      LETSENCRYPT_HOST: ebk-ml-pgadmin.enking.dev
+      LETSENCRYPT_EMAIL: nico.enking@gmail.com
     volumes:
        - pgadmin:/var/lib/pgadmin
-
-    ports:
-      - "8080:80"
     networks:
       - postgres
+      - nginx
     restart: unless-stopped
 
 networks:
   postgres:
     driver: bridge
+  nginx:
+    name: nginx
+    external: true
 
 volumes:
     postgres:
