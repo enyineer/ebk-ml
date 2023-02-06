@@ -166,7 +166,9 @@ export class AdPage {
       }
     } catch (err) {
       Logger.logger.debug('Could not find seller.');
-      Logger.logger.debug(err);
+      if (err instanceof Error) {
+        Logger.logger.debug(err.message);
+      }
       return;
     }
     
@@ -197,7 +199,9 @@ export class AdPage {
       }
     } catch (err) {
       Logger.logger.debug(`Could not determine seller rating.`);
-      Logger.logger.debug(err);
+      if (err instanceof Error) {
+        Logger.logger.debug(err.message);
+      }
     }
 
     const viewAdContactElement = await this.page.waitForSelector('div[id="viewad-contact"]');
