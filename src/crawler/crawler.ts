@@ -3,7 +3,6 @@ import { OverviewPage } from './overviewPage';
 import { clickAfter, sleep } from './utils';
 import { Robots } from '../robots/robots';
 import { PuppeteerBlocker } from '@cliqz/adblocker-puppeteer';
-import { readFile, writeFile } from 'fs/promises';
 
 type PuppeteerOptions = LaunchOptions & BrowserLaunchArgumentOptions & BrowserConnectOptions;
 
@@ -34,11 +33,7 @@ export class Crawler {
     const firstPage = (await browser.pages())[0];
     await firstPage.close();
 
-    const blocker = await PuppeteerBlocker.fromPrebuiltAdsAndTracking(fetch, {
-      path: 'adBlockerEngine.bin',
-      read: readFile,
-      write: writeFile,
-    });
+    const blocker = await PuppeteerBlocker.fromPrebuiltAdsAndTracking(fetch);
 
     await blocker.enableBlockingInPage(page);
 
