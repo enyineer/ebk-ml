@@ -1,10 +1,9 @@
-import { LaunchOptions, BrowserLaunchArgumentOptions, BrowserConnectOptions, ElementHandle } from 'puppeteer';
-import { PuppeteerExtra } from 'puppeteer-extra';
-import Puppeteer from 'puppeteer';
-import adblockPlugin from 'puppeteer-extra-plugin-adblocker';
+import { LaunchOptions, BrowserLaunchArgumentOptions, BrowserConnectOptions, launch } from 'puppeteer';
 import { OverviewPage } from './overviewPage';
 import { clickAfter, sleep } from './utils';
 import { Robots } from '../robots/robots';
+import { PuppeteerBlocker } from '@cliqz/adblocker-puppeteer';
+import { readFile, writeFile } from 'fs/promises';
 
 type PuppeteerOptions = LaunchOptions & BrowserLaunchArgumentOptions & BrowserConnectOptions;
 
@@ -14,31 +13,36 @@ type Params = {
 
 export class Crawler {
   private readonly baseUrl = 'https://www.ebay-kleinanzeigen.de';
-  private readonly puppeteer: PuppeteerExtra;
   private readonly launchOptions: PuppeteerOptions | undefined;
   private readonly robots: Robots;
   
   constructor(params?: Params) {
-    this.puppeteer = new PuppeteerExtra(Puppeteer);
-    this.puppeteer.use(adblockPlugin({
-        blockTrackersAndAnnoyances: true,
-    }));
     this.launchOptions = params?.launchOptions;
     this.robots = new Robots(this.baseUrl);
   }
 
   async crawl() {
-    const browser = await this.puppeteer.launch(this.launchOptions);
-    const pages = await browser.pages();
-    const page = pages[0];
-
     const isAllowed = await this.robots.isAllowed(this.baseUrl);
 
     if (!isAllowed) {
       throw new Error(`Not allowed to crawl ${this.baseUrl}`);
     }
 
-    page.goto(this.baseUrl);
+    const browser = await launch(this.launchOptions);
+    const page = await browser.newPage();
+    
+    const firstPage = (await browser.pages())[0];
+    await firstPage.close();
+
+    const blocker = await PuppeteerBlocker.fromPrebuiltAdsAndTracking(fetch, {
+      path: 'adBlockerEngine.bin',
+      read: readFile,
+      write: writeFile,
+    });
+
+    await blocker.enableBlockingInPage(page);
+
+    await page.goto(this.baseUrl);
 
     // https://css-tricks.com/almanac/selectors/a/attribute/
     // https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors

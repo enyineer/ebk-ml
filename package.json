@@ -6,13 +6,12 @@
     "crawl:dev": "ts-node-dev src/crawler/index.ts"
   },
   "dependencies": {
+    "@cliqz/adblocker-puppeteer": "^1.25.2",
     "@prisma/client": "^4.9.0",
     "pino": "^8.8.0",
     "pino-pretty": "^9.1.1",
     "prisma": "^4.9.0",
     "puppeteer": "^19.6.3",
-    "puppeteer-extra": "^3.3.4",
-    "puppeteer-extra-plugin-adblocker": "^2.13.5",
     "robots-parser": "^3.0.0",
     "ts-node": "^10.9.1",
     "typescript": "^4.9.5"

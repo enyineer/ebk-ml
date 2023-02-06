@@ -40,7 +40,9 @@ export class AdPage {
       throw new Error(`Not allowed to crawl ${url}`);
     }
 
-    await this.page.goto(url);
+    await this.page.goto(url, {
+      waitUntil: 'networkidle0',
+    });
 
     const priceElement = await this.page.waitForSelector('h2[id="viewad-price"]');
     let price: string;

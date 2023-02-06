@@ -4,10 +4,12 @@ const main = async () => {
   const puppeteer = new Crawler({
     launchOptions: {
       headless: process.env.PUPPETEER_HEADLESS === 'true',
-      args: [
-        '--start-maximized'
-      ],
-    }
+      args: [`--window-size=1920,1000`],
+      defaultViewport: {
+        width: 1920,
+        height: 1000,
+      },
+    },
   });
 
   puppeteer.crawl();
