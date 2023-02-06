@@ -1,6 +1,7 @@
 import robotsParser, { Robot } from 'robots-parser';
 import { readFile } from 'fs/promises';
 import { resolve } from 'path';
+import { Logger } from '../logger/logger';
 
 export class Robots {
   private url: string;
@@ -17,6 +18,7 @@ export class Robots {
       if (res.ok) {
         robotsTxt = await res.text();
       } else {
+        Logger.logger.warn(`Falling back to local robots.txt because status from server was: ${res.status}`);
         robotsTxt = (await readFile(resolve('./robots.txt'))).toString();
       }
       Robots.parser = robotsParser(this.url, robotsTxt);
