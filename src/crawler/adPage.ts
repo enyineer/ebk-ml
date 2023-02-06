@@ -272,12 +272,12 @@ export class AdPage {
       create: {
         ebkId: seller.id,
         isPrivateSeller,
-        name: seller.name,
+        name: isPrivateSeller ? 'Private' : seller.name,
         rating: sellerRating || -1,
       },
       update: {
-        name: seller.name,
         isPrivateSeller,
+        name: isPrivateSeller ? 'Private' : seller.name,
         rating: sellerRating || -1,
       },
       where: {
