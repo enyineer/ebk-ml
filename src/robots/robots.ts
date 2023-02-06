@@ -1,21 +1,24 @@
 import robotsParser, { Robot } from 'robots-parser';
+import { readFile } from 'fs/promises';
+import { resolve } from 'path';
 
 export class Robots {
   private url: string;
-  private static parser: Robot | null;
+  private static parser: Robot | undefined;
 
   constructor(baseUrl: string) {
     this.url = `${baseUrl}/robots.txt`;
-    Robots.parser = null;
   }
 
   async isAllowed(url: string, userAgent = '*') {
-    if (Robots.parser === null) {
+    if (Robots.parser === undefined) {
+      let robotsTxt: string;
       const res = await fetch(this.url);
-      if (!res.ok) {
-        throw new Error(`Could not read robots.txt from ${this.url}`);
+      if (res.ok) {
+        robotsTxt = await res.text();
+      } else {
+        robotsTxt = (await readFile(resolve('./robots.txt'))).toString();
       }
-      const robotsTxt = await res.text();
       Robots.parser = robotsParser(this.url, robotsTxt);
     }
 
