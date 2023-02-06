@@ -2,6 +2,7 @@ import { Page } from 'puppeteer';
 import { Logger } from '../logger/logger';
 import { Robots } from '../robots/robots';
 import { AdId, AdPage } from './adPage';
+import { sleep } from '../utils/utils';
 
 type PageId = {
   name: string;
@@ -34,6 +35,8 @@ export class OverviewPage {
       } catch (err) {
         Logger.logger.error(`Failed crawling page #${i}.`);
         Logger.logger.error(err);
+        // Wait before recrawling, website might be down
+        await sleep(30000);
       }
       if (i === 50) {
         // Will be 1 on next loop because update condition is called on continue
