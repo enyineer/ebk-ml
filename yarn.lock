@@ -769,6 +769,7 @@ __metadata:
     pino-pretty: ^9.1.1
     prisma: ^4.9.0
     puppeteer: ^19.6.3
+    rimraf: ^4.1.2
     robots-parser: ^3.0.0
     ts-node: ^10.9.1
     ts-node-dev: ^2.0.0
@@ -1863,6 +1864,15 @@ __metadata:
   bin:
     rimraf: ./bin.js
   checksum: cdc7f6eacb17927f2a075117a823e1c5951792c6498ebcce81ca8203454a811d4cf8900314154d3259bb8f0b42ab17f67396a8694a54cae3283326e57ad250cd
+  languageName: node
+  linkType: hard
+
+"rimraf@npm:^4.1.2":
+  version: 4.1.2
+  resolution: "rimraf@npm:4.1.2"
+  bin:
+    rimraf: dist/cjs/src/bin.js
+  checksum: 480b8147fd9bcbef3ac118f88a7b1169c3872977a3411a0c84df838bfc30e175a394c0db6f9619fc8b8a886a18c6d779d5e74f380a0075ecc710afaf81b3f50c
   languageName: node
   linkType: hard
 

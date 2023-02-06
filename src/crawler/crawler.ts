@@ -58,7 +58,6 @@ export class Crawler {
 
     if (closeLoginButton) {
       await clickAfter(closeLoginButton, 1000);
-      sleep(1000);
     }
   
     const overviewPage: OverviewPage = new OverviewPage({

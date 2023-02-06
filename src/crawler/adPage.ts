@@ -404,8 +404,6 @@ export class AdPage {
     }
 
     Logger.logger.info(`Finished upserting ad to database.`);
-
-    await sleep(2000);
   }
 
   private getAdUrl = (adId: AdId) => {

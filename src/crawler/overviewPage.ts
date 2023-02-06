@@ -52,13 +52,19 @@ export class OverviewPage {
       throw new Error(`Not allowed to crawl ${url}`);
     }
 
-    await this.page.goto(url);
+    await this.page.goto(url, {
+      waitUntil: 'networkidle0',
+    });
 
     const adHrefs = await this.page.$$eval('article[class="aditem"]', (elements) => {
       const adItemHrefs: string[] = [];
       for (const element of elements) {
         const adItemHref = element.getAttribute('data-href');
         if (adItemHref !== null) {
+          if (element.innerHTML.includes('Gesuch')) {
+            // Exclude element because it's a search ad
+            continue;
+          }
           adItemHrefs.push(adItemHref);
         }
       }
