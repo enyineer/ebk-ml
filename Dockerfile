@@ -62,5 +62,6 @@ COPY --chown=nodejs:nodejs --from=build /usr/src/app/node_modules ./node_modules
 COPY --chown=nodejs:nodejs --from=build /usr/src/app/dist ./
 COPY --chown=nodejs:nodejs --from=deps /usr/src/app/.yarn/ ./.yarn/
 COPY --chown=nodejs:nodejs --from=deps /usr/src/app/package.json /usr/src/app/.yarnrc.yml /usr/src/app/yarn.lock ./
+COPY --chown=nodejs:nodejs robots.txt ./
 
 CMD [ "yarn", "crawl:prod" ]
