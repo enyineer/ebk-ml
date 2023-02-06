@@ -1,11 +1,10 @@
 import { LaunchOptions, BrowserLaunchArgumentOptions, BrowserConnectOptions, ElementHandle } from 'puppeteer';
 import { PuppeteerExtra } from 'puppeteer-extra';
 import Puppeteer from 'puppeteer';
-import stealthPlugin from 'puppeteer-extra-plugin-stealth';
 import adblockPlugin from 'puppeteer-extra-plugin-adblocker';
-import recaptchaPlugin from 'puppeteer-extra-plugin-recaptcha';
 import { OverviewPage } from './overviewPage';
 import { clickAfter, sleep } from './utils';
+import { Robots } from '../robots/robots';
 
 type PuppeteerOptions = LaunchOptions & BrowserLaunchArgumentOptions & BrowserConnectOptions;
 
@@ -14,25 +13,30 @@ type Params = {
 }
 
 export class Crawler {
-  private readonly baseUrl = 'https://www.ebay-kleinanzeigen.de/';
+  private readonly baseUrl = 'https://www.ebay-kleinanzeigen.de';
   private readonly puppeteer: PuppeteerExtra;
   private readonly launchOptions: PuppeteerOptions | undefined;
+  private readonly robots: Robots;
   
   constructor(params?: Params) {
     this.puppeteer = new PuppeteerExtra(Puppeteer);
-    this.puppeteer
-      .use(stealthPlugin())
-      .use(adblockPlugin({
+    this.puppeteer.use(adblockPlugin({
         blockTrackersAndAnnoyances: true,
-      }))
-      .use(recaptchaPlugin());
+    }));
     this.launchOptions = params?.launchOptions;
+    this.robots = new Robots(this.baseUrl);
   }
 
   async crawl() {
     const browser = await this.puppeteer.launch(this.launchOptions);
     const pages = await browser.pages();
     const page = pages[0];
+
+    const isAllowed = await this.robots.isAllowed(this.baseUrl);
+
+    if (!isAllowed) {
+      throw new Error(`Not allowed to crawl ${this.baseUrl}`);
+    }
 
     page.goto(this.baseUrl);
 

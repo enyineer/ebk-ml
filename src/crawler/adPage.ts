@@ -2,6 +2,7 @@ import { AdDetailValue, Extra } from '@prisma/client';
 import { Page } from 'puppeteer';
 import { Database } from '../database/database';
 import { Logger } from '../logger/logger';
+import { Robots } from '../robots/robots';
 import { sleep } from './utils';
 
 export type AdId = {
@@ -20,16 +21,24 @@ export class AdPage {
   private readonly page: Page;
   private readonly adId: AdId;
   private readonly client;
+  private readonly robots: Robots;
 
   constructor(params: Params) {
     this.baseUrl = params.baseUrl;
     this.page = params.page;
     this.adId = params.adId;
     this.client = Database.client;
+    this.robots = new Robots(this.baseUrl);
   }
 
   async crawlAd() {
     const url = this.getAdUrl(this.adId);
+
+    const isAllowed = await this.robots.isAllowed(url);
+
+    if (!isAllowed) {
+      throw new Error(`Not allowed to crawl ${url}`);
+    }
 
     await this.page.goto(url);
 
@@ -399,9 +408,9 @@ export class AdPage {
 
   private getAdUrl = (adId: AdId) => {
     let url = this.baseUrl;
-    url = url.concat('s-anzeige/');
-    url = url.concat(`${adId.slug}/`);
-    url = url.concat(`${adId.id}`);
+    url = url.concat('/s-anzeige');
+    url = url.concat(`/${adId.slug}/`);
+    url = url.concat(`/${adId.id}`);
 
     return url;
   }

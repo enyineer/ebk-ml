@@ -1,5 +1,6 @@
 import { Page } from 'puppeteer';
 import { Logger } from '../logger/logger';
+import { Robots } from '../robots/robots';
 import { AdId, AdPage } from './adPage';
 
 type PageId = {
@@ -17,11 +18,13 @@ export class OverviewPage {
   private readonly baseUrl: string;
   private readonly pageId: PageId;
   private readonly page: Page;
+  private readonly robots: Robots;
 
   constructor(params: Params) {
     this.baseUrl = params.baseUrl;
     this.pageId = params.pageId;
     this.page = params.page;
+    this.robots = new Robots(this.baseUrl);
   }
 
   async crawlOverview() {
@@ -42,6 +45,13 @@ export class OverviewPage {
 
   async crawlAdsForPage(page: number) {
     const url = this.getOverviewUrl(this.pageId, page);
+
+    const isAllowed = await this.robots.isAllowed(url);
+
+    if (!isAllowed) {
+      throw new Error(`Not allowed to crawl ${url}`);
+    }
+
     await this.page.goto(url);
 
     const adHrefs = await this.page.$$eval('article[class="aditem"]', (elements) => {
@@ -93,11 +103,11 @@ export class OverviewPage {
 
   private getOverviewUrl = (pageId: PageId, page?: number) => {
     let url = this.baseUrl;
-    url = url.concat(`${pageId.name}/`);
+    url = url.concat(`/${pageId.name}`);
     if (page && page > 1) {
-      url = url.concat(`seite:${page}/`);
+      url = url.concat(`/seite:${page}`);
     }
-    url = url.concat(`${pageId.category}`);
+    url = url.concat(`/${pageId.category}`);
 
     return url;
   }
