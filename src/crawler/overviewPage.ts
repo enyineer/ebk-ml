@@ -2,7 +2,7 @@ import { Page } from 'puppeteer';
 import { Logger } from '../logger/logger';
 import { Robots } from '../robots/robots';
 import { AdId, AdPage } from './adPage';
-import { sleep } from '../utils/utils';
+import { sleep } from './utils';
 
 type PageId = {
   name: string;
