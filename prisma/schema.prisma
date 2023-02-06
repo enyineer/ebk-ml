@@ -1,0 +1,109 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Ad {
+  id String @id @default(cuid())
+
+  ebkId String @unique
+
+  slug        String
+  urlId       String
+  price       Int?
+  isVB        Boolean
+  views       Int
+  locationZip Int
+
+  adDetailValues AdDetailValueEntries[]
+  extras         ExtraEntries[]
+
+  seller   Seller @relation(fields: [sellerId], references: [id])
+  sellerId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Seller {
+  id String @id @default(cuid())
+
+  ebkId           String  @unique
+  name            String
+  isPrivateSeller Boolean
+  rating          Int
+
+  ads Ad[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AdDetailValueEntries {
+  id String @id @default(cuid())
+
+  adDetailValue   AdDetailValue @relation(fields: [adDetailValueId], references: [id], onDelete: Cascade)
+  adDetailValueId String
+
+  ad   Ad     @relation(fields: [adId], references: [id], onDelete: Cascade)
+  adId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ExtraEntries {
+  id String @id @default(cuid())
+
+  extra   Extra  @relation(fields: [extraId], references: [id], onDelete: Cascade)
+  extraId String
+
+  ad   Ad     @relation(fields: [adId], references: [id], onDelete: Cascade)
+  adId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AdDetailValue {
+  id String @id @default(cuid())
+
+  adDetail   AdDetail @relation(fields: [adDetailId], references: [id])
+  adDetailId String
+  value      String
+
+  ads AdDetailValueEntries[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([adDetailId, value])
+}
+
+model AdDetail {
+  id String @id @default(cuid())
+
+  name           String          @unique
+  adDetailValues AdDetailValue[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Extra {
+  id String @id @default(cuid())
+
+  value String @unique
+
+  ads ExtraEntries[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
