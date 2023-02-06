@@ -52,9 +52,13 @@ export class AdPage {
     const priceMatcher = /([\d.]+).*/;
     let matchedPrice = priceMatcher.exec(price);
     if (!matchedPrice) {
-      throw new Error('Price contains no numeric value (VB only?).');
+      Logger.logger.debug('Price did not match RegEx (VB only?).');
+      return;
     }
     const numericPrice = parseInt(matchedPrice[1].replace('.', ''));
+    if (Number.isNaN(numericPrice)) {
+      throw new Error('Prise was non numeric even though it matched the RegEx.');
+    }
 
     const viewsElement = await this.page.waitForSelector('span[id="viewad-cntr-num"]');
     let views: number;
