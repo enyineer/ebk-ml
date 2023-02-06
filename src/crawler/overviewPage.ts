@@ -29,7 +29,8 @@ export class OverviewPage {
       try {
         await this.crawlAdsForPage(i);
       } catch (err) {
-        console.error(`Failed crawling page #${i}. ${err}`);
+        Logger.logger.error(`Failed crawling page #${i}.`);
+        Logger.logger.error(err);
       }
       if (i === 50) {
         // Will be 1 on next loop because update condition is called on continue
@@ -59,6 +60,7 @@ export class OverviewPage {
     for (const adHref of adHrefs) {
       const matches = hrefRegex.exec(adHref);
       if (!matches) {
+        Logger.logger.error(`Found invalid href: ${adHref}`);
         continue;
       }
 
@@ -83,7 +85,8 @@ export class OverviewPage {
       try {
         await adPage.crawlAd();
       } catch (err) {
-        Logger.logger.error(`Failed crawling ${adId.slug}/${adId.id} from page #${page}. ${err}`);
+        Logger.logger.error(`Failed crawling ${adId.slug}/${adId.id} from page #${page}. URL: ${this.baseUrl}/s-anzeige/${adId.slug}/${adId.id}`);
+        Logger.logger.error(err);
       }
     }
   }

@@ -12,7 +12,8 @@ export class Logger {
           options: {
             colorize: true,
           }
-        }
+        },
+        level: 'debug',
       });
 
       this.instance = _instance;

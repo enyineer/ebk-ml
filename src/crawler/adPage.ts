@@ -134,32 +134,38 @@ export class AdPage {
       id: string;
       name: string;
     };
-    const sellerElement = await this.page.waitForSelector('span > a[href*="/s-bestandsliste.html?userId="]', { timeout: 1000 });
-    if (sellerElement !== null) {
-      seller = await sellerElement.evaluate((element) => {
-        const text = element.textContent?.trim();
-        const hrefText = element.getAttribute('href');
-  
-        if (!text || !hrefText) {
-          throw new Error('Seller Element did not contain id or Username.');
-        }
-  
-        const userIdMatcher = /\/s-bestandsliste\.html\?userId=(\d+)/;
-        const userIdMatch = userIdMatcher.exec(hrefText);
-  
-        if (!userIdMatch) {
-          throw new Error('Seller Element href did not match User-ID RegEx.');
-        }
-  
-        return {
-          id: userIdMatch[1],
-          name: text,
-        };
-      });
-    } else {
-      throw new Error('Seller Element was null.');
+    try {
+      const sellerElement = await this.page.waitForSelector('span > a[href*="/s-bestandsliste.html?userId="]', { timeout: 1000 });
+      if (sellerElement !== null) {
+        seller = await sellerElement.evaluate((element) => {
+          const text = element.textContent?.trim();
+          const hrefText = element.getAttribute('href');
+    
+          if (!text || !hrefText) {
+            throw new Error('Seller Element did not contain id or Username.');
+          }
+    
+          const userIdMatcher = /\/s-bestandsliste\.html\?userId=(\d+)/;
+          const userIdMatch = userIdMatcher.exec(hrefText);
+    
+          if (!userIdMatch) {
+            throw new Error('Seller Element href did not match User-ID RegEx.');
+          }
+    
+          return {
+            id: userIdMatch[1],
+            name: text,
+          };
+        });
+      } else {
+        throw new Error('Seller Element was null.');
+      }
+    } catch (err) {
+      Logger.logger.debug('Could not find seller.');
+      Logger.logger.debug(err);
+      return;
     }
-
+    
     let sellerRating: number | null = null;
     try {
       const sellerRatingElement = await this.page.waitForSelector('i[class*="userbadge-rating-inline"]', {
@@ -186,7 +192,8 @@ export class AdPage {
         throw new Error('Seller Rating Element was null.');
       }
     } catch (err) {
-      Logger.logger.debug(`Could not determine seller rating. ${err}`);
+      Logger.logger.debug(`Could not determine seller rating.`);
+      Logger.logger.debug(err);
     }
 
     const viewAdContactElement = await this.page.waitForSelector('div[id="viewad-contact"]');
